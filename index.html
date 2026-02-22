@@ -9,15 +9,15 @@
     html, body {
       margin: 0;
       padding: 0;
-      overflow: hidden;            /* verhindert Scrollbars im iFrame */
+      overflow: hidden;          /* keine Scrollbars im iFrame */
       background: transparent;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
-    /* Das ist die "Designgröße", von der aus skaliert wird */
-    :root {
-      --base-w: 800;
-      --base-h: 600;
+    /* “Designgröße” (von der aus wir auf die Kachel fitten) */
+    :root{
+      --base-w: 900;
+      --base-h: 900;
     }
 
     #fit {
@@ -27,8 +27,8 @@
     }
 
     .inner {
-      padding: 8px;
       box-sizing: border-box;
+      padding: 8px;
       width: 100%;
       height: 100%;
     }
@@ -40,7 +40,7 @@
     <div class="inner">
       <div
         class="mvv-departure-monitor"
-        monitor-configuration="eyJsYW5ndWFnZSI6eyJkZXBhcnR1cmUiOiJBYmZhaHJ0IiwidHJhaW5TdG9wcyI6IkhhbHRlc3RlbGxlbiIsImRpcmVjdGlvbiI6IlJpY2h0dW5nIiwiZm9vdGVyTm90ZSI6IqkgQ29weXJpZ2h0IiwiZm9vdGVyVGV4dCI6IldlaXRlcmUgRmFocnBsYW5hdXNr/G5mdGUgdW50ZXIgd3d3Lm12di1hdXNrdW5mdC5kZSBvZGVyIG1pdCBkZXIgTVZWLUFwcCIsImhlYWRlclRleHQiOiJBYmZhaHJ0ZW4gZvxyIGhldXRlLCAiLCJsYW5ndWFnZSI6ImRlIiwibGluZSI6IkxpbmllIiwibGl2ZSI6IkxpdmUiLCJzdG9wIjoiSGFsdGVzdGVsbGUiLCJ0cmFjayI6IkdsZWlzIn0sImlzRnVsbHNjcmVlbiI6ZmFsc2UsInN0YXRpb25zIjpbeyJzdGF0aW9uIjp7InVzYWdlIjoic2YiLCJ0eXBlIjoiYW55IiwibmFtZSI6Ik38bmNoZW4sIERyeWdhbHNraS1BbGxlZSIsInN0YXRlbGVzcyI6IjkxMDAxNDY0IiwiYW55VHlwZSI6InN0b3AiLCJzb3J0IjoiMiIsInF1YWxpdHkiOiIyNjMiLCJiZXN0IjoiMSIsIm9iamVjdCI6IkRyeWdhbHNraS1BbGxlZSIsIm1haW5Mb2MiOiJN/G5jaGVuIiwibW9kZXMiOiI1IiwicmVmIjp7ImlkIjoiOTEwMDE0NjQiLCJnaWQiOiJkZTowOTE2MjoxNDY0Iiwib21jIjoiOTE2MjAwMCIsInBsYWNlSUQiOiIxIiwicGxhY2UiOiJN/G5jaGVuIiwiY29vcmRzIjoiMTI4MTEwOS4wMDAwMCw1ODc2Nzk3LjAwMDAwIn0sImlkIjoiZGU6MDkxNjI6MTQ2NCJ9LCJsaW5lcyI6W3sibnVtYmVyIjoiNTEiLCJzeW1ib2wiOiIyNDA1MS5zdmciLCJkaXJlY3Rpb24iOiJNb29zYWNoIiwic3RhdGVsZXNzIjoic3dtOjAzMDUxOkc6UjowMTYiLCJuYW1lIjoiTWV0cm9CdXMifSx7Im51bWJlciI6IjEzMiIsInN5bWJvbCI6IjAzMTMyLnN2ZyIsImRpcmVjdGlvbiI6Ik1hcmllbnBsYXR6Iiwic3RhdGVsZXNzIjoic3dtOjAzMTMyOkc6UjowMTYiLCJuYW1lIjoiQnVzIn0seyJudW1iZXIiOiIxNTEiLCJzeW1ib2wiOiIwMzE1MS5zdmciLCJkaXJlY3Rpb24iOiJXZXN0ZnJpZWRob2YiLCJzdGF0ZWxlc3MiOiJzd206MDMxNTE6RzpSOjAxNiIsIm5hbWUiOiJCdXMifV0sImFsbExpbmVzIjpbeyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6IkFpZGVuYmFjaHN0cmHfZSIsInN0YXRlbGVzcyI6InN3bTowMzA1MTpHOkg6MDE2IiwibmFtZSI6Ik1ldHJvQnVzIn0seyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6Ik1vb3NhY2giLCJzdGF0ZWxlc3MiOiJzd206MDMwNTE6RzpSOjAxNiIsIm5hbWUiOiJNZXRyb0J1cyJ9LHsibnVtYmVyIjoiMTMyIiwic3ltYm9sIjoiMDMxMzIuc3ZnIiwiZGlyZWN0aW9uIjoiRm9yc3RlbnJpZWRlciBQYXJrIiwic3RhdGVsZXNzIjoic3dtOjAzMTMyOkc6SDowMTYiLCJuYW1lIjoiQnVzIn0seyJudW1iZXIiOiIxMzIiLCJzeW1ib2wiOiIwMzEzMi5zdmciLCJkaXJlY3Rpb24iOiJNYXJpZW5wbGF0eiIsInN0YXRlbGVzcyI6InN3bTowMzEzMjpHOlI6MDE2IiwibmFtZSI6IkJ1cyJ9LHsibnVtYmVyIjoiMTUxIiwic3ltYm9sIjoiMDMxNTEuc3ZnIiwiZGlyZWN0aW9uIjoiUGFya3N0YWR0IFNvbGxuIiwic3RhdGVsZXNzIjoic3dtOjAzMTUxOkc6SDowMTYiLCJuYW1lIjoiQnVzIn0seyJudW1iZXIiOiIxNTEiLCJzeW1ib2wiOiIwMzE1MS5zdmciLCJkaXJlY3Rpb24iOiJXZXN0ZnJpZWRob2YiLCJzdGF0ZWxlc3MiOiJzd206MDMxNTE6RzpSOjAxNiIsIm5hbWUiOiJCdXMifV0sImxlYWRUaW1lTWludXRlcyI6MH1dLCJsaW5lcyI6W10sIm1heFJlc3VsdHMiOjE1LCJmZXRjaEludGVydmFsSW5NaW51dGVzIjoyLCJzaG93Tm90aWZpY2F0aW9uIjp0cnVlfQ=="
+        monitor-configuration="eyJsYW5ndWFnZSI6eyJkZXBhcnR1cmUiOiJBYmZhaHJ0IiwidHJhaW5TdG9wcyI6IkhhbHRlc3RlbGxlbiIsImRpcmVjdGlvbiI6IlJpY2h0dW5nIiwiZm9vdGVyTm90ZSI6IqkgQ29weXJpZ2h0IiwiZm9vdGVyVGV4dCI6IldlaXRlcmUgRmFocnBsYW5hdXNr/G5mdGUgdW50ZXIgd3d3Lm12di1hdXNrdW5mdC5kZSBvZGVyIG1pdCBkZXIgTVZWLUFwcCIsImhlYWRlclRleHQiOiJBYmZhaHJ0ZW4gZvxyIGhldXRlLCAiLCJsYW5ndWFnZSI6ImRlIiwibGluZSI6IkxpbmllIiwibGl2ZSI6IkxpdmUiLCJzdG9wIjoiSGFsdGVzdGVsbGUiLCJ0cmFjayI6IkdsZWlzIn0sImlzRnVsbHNjcmVlbiI6ZmFsc2UsInN0YXRpb25zIjpbeyJzdGF0aW9uIjp7InVzYWdlIjoic2YiLCJ0eXBlIjoiYW55IiwibmFtZSI6Ik38bmNoZW4sIERyeWdhbHNraS1BbGxlZSIsInN0YXRlbGVzcyI6IjkxMDAxNDY0IiwiYW55VHlwZSI6InN0b3AiLCJzb3J0IjoiMiIsInF1YWxpdHkiOiIyNjMiLCJiZXN0IjoiMSIsIm9iamVjdCI6IkRyeWdhbHNraS1BbGxlZSIsIm1haW5Mb2MiOiJN/G5jaGVuIiwibW9kZXMiOiI1IiwicmVmIjp7ImlkIjoiOTEwMDE0NjQiLCJnaWQiOiJkZTowOTE2MjoxNDY0Iiwib21jIjoiOTE2MjAwMCIsInBsYWNlSUQiOiIxIiwicGxhY2UiOiJN/G5jaGVuIiwiY29vcmRzIjoiMTI4MTEwOS4wMDAwMCw1ODc2Nzk3LjAwMDAwIn0sImlkIjoiZGU6MDkxNjI6MTQ2NCJ9LCJsaW5lcyI6W3sibnVtYmVyIjoiNTEiLCJzeW1ib2wiOiIyNDA1MS5zdmciLCJkaXJlY3Rpb24iOiJNb29zYWNoIiwic3RhdGVsZXNzIjoic3dtOjAzMDUxOkc6UjowMTYiLCJuYW1lIjoiTWV0cm9CdXMifSx7Im51bWJlciI6IjEzMiIsInN5bWJvbCI6IjAzMTMyLnN2ZyIsImRpcmVjdGlvbiI6Ik1hcmllbnBsYXR6Iiwic3RhdGVsZXNzIjoic3dtOjAzMTMyOkc6UjowMTYiLCJuYW1lIjoiQnVzIn0seyJudW1iZXIiOiIxNTEiLCJzeW1ib2wiOiIwMzE1MS5zdmciLCJkaXJlY3Rpb24iOiJXZXN0ZnJpZWRob2YiLCJzdGF0ZWxlc3MiOiJzd206MDMxNTE6RzpSOjAxNiIsIm5hbWUiOiJCdXMifV0sImFsbExpbmVzIjpbeyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6IkFpZGVuYmFjaHN0cmHfZSIsInN0YXRlbGVzcyI6InN3bTowMzA1MTpHOkg6MDE2IiwibmFtZSI6Ik1ldHJvQnVzIn0seyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6Ik1vb3NhY2giLCJzdGF0ZWxlc3MiOiJzd206MDMwNTE6RzpSOjAxNiIsIm5hbWUiOiJNZXRyb0J1cyJ9LHsibnVtYmVyIjoiMTMyIiwic3ltYm9sIjoiMDMxMzIuc3ZnIiwiZGlyZWN0aW9uIjoiRm9yc3RlbnJpZWRlciBQYXJrIiwic3RhdGVsZXNzIjoic3dtOjAzMTMyOkc6SDowMTYiLCJuYW1lIjoiQnVzIn0seyJudW1iZXIiOiIxMzIiLCJzeW1ib2wiOiIwMzEzMi5zdmciLCJkaXJlY3Rpb24iOiJNYXJpZW5wbGF0eiIsInN0YXRlbGVzcyI6InN3bTowMzEzMjpHOlI6MDE2IiwibmFtZSI6IkJ1cyJ9LHsibnVtYmVyIjoiMTUxIiwic3ltYm9sIjoiMDMxNTEuc3ZnIiwiZGlyZWN0aW9uIjoiUGFya3N0YWR0IFNvbGxuIiwic3RhdGVsZXNzIjoic3dtOjAzMTUxOkc6SDowMTYiLCJuYW1lIjoiQnVzIn0seyJudW1iZXIiOiIxNTEiLCJzeW1ib2wiOiIwMzE1MS5zdmciLCJkaXJlY3Rpb24iOiJXZXN0ZnJpZWRob2YiLCJzdGF0ZWxlc3MiOiJzd206MDMxNTE6RzpSOjAxNiIsIm5hbWUiOiJCdXMifV0sImxlYWRUaW1lTWludXRlcyI6MH1dLCJsaW5lcyI6W10sIm1heFJlc3VsdHMiOjEwLCJmZXRjaEludGVydmFsSW5NaW51dGVzIjoyLCJzaG93Tm90aWZpY2F0aW9uIjp0cnVlfQ=="
       ></div>
     </div>
   </div>
@@ -48,36 +48,29 @@
   <script src="https://www.mvv-muenchen.de/typo3conf/ext/sn_mvv_efa/Resources/Public/mvv-monitor/mvv-monitor.min.js"></script>
 
   <script>
-    function fitToIframe() {
+    function fitToTile() {
       const fit = document.getElementById("fit");
 
-      // Basisgröße aus CSS-Variablen lesen
       const styles = getComputedStyle(document.documentElement);
-      const baseW = parseFloat(styles.getPropertyValue("--base-w")) || 800;
-      const baseH = parseFloat(styles.getPropertyValue("--base-h")) || 600;
+      const baseW = parseFloat(styles.getPropertyValue("--base-w")) || 900;
+      const baseH = parseFloat(styles.getPropertyValue("--base-h")) || 900;
 
-      // iFrame/View Größe
       const w = window.innerWidth;
       const h = window.innerHeight;
 
-      // Auf Breite UND Höhe fitten
       const scale = Math.min(w / baseW, h / baseH);
-
       fit.style.transform = `scale(${scale})`;
     }
 
-    // 1) direkt nach load
-    window.addEventListener("load", fitToIframe);
+    window.addEventListener("load", fitToTile);
+    window.addEventListener("resize", fitToTile);
 
-    // 2) bei Resize (wenn Homey die Kachel anders rendert)
-    window.addEventListener("resize", fitToIframe);
-
-    // 3) MVV rendert asynchron -> ein paar Mal nachziehen
+    // MVV rendert asynchron -> ein paar Mal nachjustieren
     let tries = 0;
     const timer = setInterval(() => {
-      fitToIframe();
+      fitToTile();
       tries++;
-      if (tries >= 12) clearInterval(timer); // ~6 Sekunden
+      if (tries >= 12) clearInterval(timer); // ~6s
     }, 500);
   </script>
 </body>
