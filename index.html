@@ -1,104 +1,26 @@
-<!doctype html>
-<html lang="de">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1" />
-    <title>MVV Abfahrtsmonitor (Homey)</title>
-    <style>
-      /* Fill the iframe/page completely */
-      html,
-      body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        background: transparent;
-        overflow: hidden;
-      }
+<!-- MVV Haltestellen-Widget für Homey -->
 
-      /* Outer box = whatever size Homey gives the widget */
-      #outer {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-      }
+<style>
+  /* Optional: etwas Luft & saubere Einbettung im Homey-Widget */
+  .mvv-widget-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
 
-      /*
-        Inner "stage" gets scaled so that the COMPLETE content is always visible.
-        You can tweak --design-w/--design-h if you want a different base layout size.
-      */
-      #stage {
-        --design-w: 800px;
-        --design-h: 600px;
+  .mvv-departure-monitor {
+    width: 100%;
+  }
+</style>
 
-        position: absolute;
-        left: 0;
-        top: 0;
+<div class="mvv-widget-wrap">
+  <div
+    class="mvv-departure-monitor"
+    monitor-configuration="eyJsYW5ndWFnZSI6eyJkZXBhcnR1cmUiOiJBYmZhaHJ0IiwidHJhaW5TdG9wcyI6IkhhbHRlc3RlbGxlbiIsImRpcmVjdGlvbiI6IlJpY2h0dW5nIiwiZm9vdGVyTm90ZSI6IqkgQ29weXJpZ2h0IiwiZm9vdGVyVGV4dCI6IldlaXRlcmUgRmFocnBsYW5hdXNr/G5mdGUgdW50ZXIgd3d3Lm12di1hdXNrdW5mdC5kZSBvZGVyIG1pdCBkZXIgTVZWLUFwcCIsImhlYWRlclRleHQiOiJBYmZhaHJ0ZW4gZvxyIGhldXRlLCAiLCJsYW5ndWFnZSI6ImRlIiwibGluZSI6IkxpbmllIiwibGl2ZSI6IkxpdmUiLCJzdG9wIjoiSGFsdGVzdGVsbGUiLCJ0cmFjayI6IkdsZWlzIn0sImlzRnVsbHNjcmVlbiI6ZmFsc2UsInN0YXRpb25zIjpbeyJzdGF0aW9uIjp7InVzYWdlIjoic2YiLCJ0eXBlIjoiYW55IiwibmFtZSI6Ik38bmNoZW4sIERyeWdhbHNraS1BbGxlZSIsInN0YXRlbGVzcyI6IjkxMDAxNDY0IiwiYW55VHlwZSI6InN0b3AiLCJzb3J0IjoiMiIsInF1YWxpdHkiOiIyNjQiLCJiZXN0IjoiMSIsIm9iamVjdCI6IkRyeWdhbHNraS1BbGxlZSIsIm1haW5Mb2MiOiJN/G5jaGVuIiwibW9kZXMiOiI1IiwicmVmIjp7ImlkIjoiOTEwMDE0NjQiLCJnaWQiOiJkZTowOTE2MjoxNDY0Iiwib21jIjoiOTE2MjAwMCIsInBsYWNlSUQiOiIxIiwicGxhY2UiOiJN/G5jaGVuIiwiY29vcmRzIjoiMTI4MTEwOS4wMDAwMCw1ODc2Nzk3LjAwMDAwIn0sImlkIjoiZGU6MDkxNjI6MTQ2NCJ9LCJsaW5lcyI6W3sibnVtYmVyIjoiMTMyIiwic3ltYm9sIjoiMDMxMzIuc3ZnIiwiZGlyZWN0aW9uIjoiTWFyaWVucGxhdHoiLCJzdGF0ZWxlc3MiOiJzd206MDMxMzI6RzpSOjAxNiIsIm5hbWUiOiJCdXMifV0sImFsbExpbmVzIjpbeyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6IkFpZGVuYmFjaHN0cmHfZSIsInN0YXRlbGVzcyI6InN3bTowMzA1MTpHOkg6MDE2IiwibmFtZSI6Ik1ldHJvQnVzIn0seyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6Ik1vb3NhY2giLCJzdGF0ZWxlc3MiOiJzd206MDMwNTE6RzpSOjAxNiIsIm5hbWUiOiJNZXRyb0J1cyJ9LHsibnVtYmVyIjoiMTMyIiwic3ltYm9sIjoiMDMxMzIuc3ZnIiwiZGlyZWN0aW9uIjoiRm9yc3RlbnJpZWRlciBQYXJrIiwic3RhdGVsZXNzIjoic3dtOjAzMTMyOkc6SDowMTYiLCJuYW1lIjoiQnVzIn0seyJudW1iZXIiOiIxMzIiLCJzeW1ib2wiOiIwMzEzMi5zdmciLCJkaXJlY3Rpb24iOiJNYXJpZW5wbGF0eiIsInN0YXRlbGVzcyI6InN3bTowMzEzMjpHOlI6MDE2IiwibmFtZSI6IkJ1cyJ9LHsibnVtYmVyIjoiMTUxIiwic3ltYm9sIjoiMDMxNTEuc3ZnIiwiZGlyZWN0aW9uIjoiUGFya3N0YWR0IFNvbGxuIiwic3RhdGVsZXNzIjoic3dtOjAzMTUxOkc6SDowMTYiLCJuYW1lIjoiQnVzIn0seyJudW1iZXIiOiIxNTEiLCJzeW1ib2wiOiIwMzE1MS5zdmciLCJkaXJlY3Rpb24iOiJXZXN0ZnJpZWRob2YiLCJzdGF0ZWxlc3MiOiJzd206MDMxNTE6RzpSOjAxNiIsIm5hbWUiOiJCdXMifV0sImxlYWRUaW1lTWludXRlcyI6MH0seyJzdGF0aW9uIjp7InVzYWdlIjoic2YiLCJ0eXBlIjoiYW55IiwibmFtZSI6Ik38bmNoZW4sIE1hY2h0bGZpbmdlciBTdHJh32UiLCJzdGF0ZWxlc3MiOiI5MTAwMTQ3MCIsImFueVR5cGUiOiJzdG9wIiwic29ydCI6IjIiLCJxdWFsaXR5IjoiNDMxIiwiYmVzdCI6IjEiLCJvYmplY3QiOiJNYWNodGxmaW5nZXIgU3RyYd9lIiwibWFpbkxvYyI6Ik38bmNoZW4iLCJtb2RlcyI6IjIsNSIsInJlZiI6eyJpZCI6IjkxMDAxNDcwIiwiZ2lkIjoiZGU6MDkxNjI6MTQ3MCIsIm9tYyI6IjkxNjIwMDAiLCJwbGFjZUlEIjoiMSIsInBsYWNlIjoiTfxuY2hlbiIsImNvb3JkcyI6IjEyODE3NDEuMDAwMDAsNTg3Njk1Ni4wMDAwMCJ9LCJpZCI6ImRlOjA5MTYyOjE0NzAifSwibGluZXMiOlt7Im51bWJlciI6IlUzIiwic3ltYm9sIjoiMDEwVTMuc3ZnIiwiZGlyZWN0aW9uIjoiTW9vc2FjaCIsInN0YXRlbGVzcyI6InN3bTowMTBVMzpHOlI6MDE2IiwibmFtZSI6IlUtQmFobiJ9XSwiYWxsTGluZXMiOlt7Im51bWJlciI6IlUzIiwic3ltYm9sIjoiMDEwVTMuc3ZnIiwiZGlyZWN0aW9uIjoiRvxyc3RlbnJpZWQgV2VzdCIsInN0YXRlbGVzcyI6InN3bTowMTBVMzpHOkg6MDE2IiwibmFtZSI6IlUtQmFobiJ9LHsibnVtYmVyIjoiVTMiLCJzeW1ib2wiOiIwMTBVMy5zdmciLCJkaXJlY3Rpb24iOiJNb29zYWNoIiwic3RhdGVsZXNzIjoic3dtOjAxMFUzOkc6UjowMTYiLCJuYW1lIjoiVS1CYWhuIn0seyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6IkFpZGVuYmFjaHN0cmHfZSIsInN0YXRlbGVzcyI6InN3bTowMzA1MTpHOkg6MDE2IiwibmFtZSI6Ik1ldHJvQnVzIn0seyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6Ik1vb3NhY2giLCJzdGF0ZWxlc3MiOiJzd206MDMwNTE6RzpSOjAxNiIsIm5hbWUiOiJNZXRyb0J1cyJ9XSwibGVhZFRpbWVNaW51dGVzIjowfV0sImxpbmVzIjpbXSwibWF4UmVzdWx0cyI6MTAsImZldGNoSW50ZXJ2YWxJbk1pbnV0ZXMiOjIsInNob3dOb3RpZmljYXRpb24iOnRydWV9"
+  ></div>
+</div>
 
-        width: var(--design-w);
-        height: var(--design-h);
-
-        transform-origin: top left;
-      }
-
-      /* Keep the MVV widget from adding unexpected page spacing */
-      .mvv-departure-monitor {
-        width: 100%;
-        height: 100%;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id="outer">
-      <div id="stage">
-        <div
-          class="mvv-departure-monitor"
-          monitor-configuration="eyJsYW5ndWFnZSI6eyJkZXBhcnR1cmUiOiJBYmZhaHJ0IiwidHJhaW5TdG9wcyI6IkhhbHRlc3RlbGxlbiIsImRpcmVjdGlvbiI6IlJpY2h0dW5nIiwiZm9vdGVyTm90ZSI6IqkgQ29weXJpZ2h0IiwiZm9vdGVyVGV4dCI6IldlaXRlcmUgRmFocnBsYW5hdXNr/G5mdGUgdW50ZXIgd3d3Lm12di1hdXNrdW5mdC5kZSBvZGVyIG1pdCBkZXIgTVZWLUFwcCIsImhlYWRlclRleHQiOiJBYmZhaHJ0ZW4gZvxyIGhldXRlLCAiLCJsYW5ndWFnZSI6ImRlIiwibGluZSI6IkxpbmllIiwibGl2ZSI6IkxpdmUiLCJzdG9wIjoiSGFsdGVzdGVsbGUiLCJ0cmFjayI6IkdsZWlzIn0sImlzRnVsbHNjcmVlbiI6ZmFsc2UsInN0YXRpb25zIjpbeyJzdGF0aW9uIjp7InVzYWdlIjoic2YiLCJ0eXBlIjoiYW55IiwibmFtZSI6Ik38bmNoZW4sIERyeWdhbHNraS1BbGxlZSIsInN0YXRlbGVzcyI6IjkxMDAxNDY0IiwiYW55VHlwZSI6InN0b3AiLCJzb3J0IjoiMiIsInF1YWxpdHkiOiIyNjQiLCJiZXN0IjoiMSIsIm9iamVjdCI6IkRyeWdhbHNraS1BbGxlZSIsIm1haW5Mb2MiOiJN/G5jaGVuIiwibW9kZXMiOiI1IiwicmVmIjp7ImlkIjoiOTEwMDE0NjQiLCJnaWQiOiJkZTowOTE2MjoxNDY0Iiwib21jIjoiOTE2MjAwMCIsInBsYWNlSUQiOiIxIiwicGxhY2UiOiJN/G5jaGVuIiwiY29vcmRzIjoiMTI4MTEwOS4wMDAwMCw1ODc2Nzk3LjAwMDAwIn0sImlkIjoiZGU6MDkxNjI6MTQ2NCJ9LCJsaW5lcyI6W3sibnVtYmVyIjoiMTMyIiwic3ltYm9sIjoiMDMxMzIuc3ZnIiwiZGlyZWN0aW9uIjoiTWFyaWVucGxhdHoiLCJzdGF0ZWxlc3MiOiJzd206MDMxMzI6RzpSOjAxNiIsIm5hbWUiOiJCdXMifV0sImFsbExpbmVzIjpbeyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6IkFpZGVuYmFjaHN0cmHfZSIsInN0YXRlbGVzcyI6InN3bTowMzA1MTpHOkg6MDE2IiwibmFtZSI6Ik1ldHJvQnVzIn0seyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6Ik1vb3NhY2giLCJzdGF0ZWxlc3MiOiJzd206MDMwNTE6RzpSOjAxNiIsIm5hbWUiOiJNZXRyb0J1cyJ9LHsibnVtYmVyIjoiMTMyIiwic3ltYm9sIjoiMDMxMzIuc3ZnIiwiZGlyZWN0aW9uIjoiRm9yc3RlbnJpZWRlciBQYXJrIiwic3RhdGVsZXNzIjoic3dtOjAzMTMyOkc6SDowMTYiLCJuYW1lIjoiQnVzIn0seyJudW1iZXIiOiIxMzIiLCJzeW1ib2wiOiIwMzEzMi5zdmciLCJkaXJlY3Rpb24iOiJNYXJpZW5wbGF0eiIsInN0YXRlbGVzcyI6InN3bTowMzEzMjpHOlI6MDE2IiwibmFtZSI6IkJ1cyJ9LHsibnVtYmVyIjoiMTUxIiwic3ltYm9sIjoiMDMxNTEuc3ZnIiwiZGlyZWN0aW9uIjoiUGFya3N0YWR0IFNvbGxuIiwic3RhdGVsZXNzIjoic3dtOjAzMTUxOkc6SDowMTYiLCJuYW1lIjoiQnVzIn0seyJudW1iZXIiOiIxNTEiLCJzeW1ib2wiOiIwMzE1MS5zdmciLCJkaXJlY3Rpb24iOiJXZXN0ZnJpZWRob2YiLCJzdGF0ZWxlc3MiOiJzd206MDMxNTE6RzpSOjAxNiIsIm5hbWUiOiJCdXMifV0sImxlYWRUaW1lTWludXRlcyI6MH0seyJzdGF0aW9uIjp7InVzYWdlIjoic2YiLCJ0eXBlIjoiYW55IiwibmFtZSI6Ik38bmNoZW4sIE1hY2h0bGZpbmdlciBTdHJh32UiLCJzdGF0ZWxlc3MiOiI5MTAwMTQ3MCIsImFueVR5cGUiOiJzdG9wIiwic29ydCI6IjIiLCJxdWFsaXR5IjoiNDMxIiwiYmVzdCI6IjEiLCJvYmplY3QiOiJNYWNodGxmaW5nZXIgU3RyYd9lIiwibWFpbkxvYyI6Ik38bmNoZW4iLCJtb2RlcyI6IjIsNSIsInJlZiI6eyJpZCI6IjkxMDAxNDcwIiwiZ2lkIjoiZGU6MDkxNjI6MTQ3MCIsIm9tYyI6IjkxNjIwMDAiLCJwbGFjZUlEIjoiMSIsInBsYWNlIjoiTfxuY2hlbiIsImNvb3JkcyI6IjEyODE3NDEuMDAwMDAsNTg3Njk1Ni4wMDAwMCJ9LCJpZCI6ImRlOjA5MTYyOjE0NzAifSwibGluZXMiOlt7Im51bWJlciI6IlUzIiwic3ltYm9sIjoiMDEwVTMuc3ZnIiwiZGlyZWN0aW9uIjoiTW9vc2FjaCIsInN0YXRlbGVzcyI6InN3bTowMTBVMzpHOlI6MDE2IiwibmFtZSI6IlUtQmFobiJ9XSwiYWxsTGluZXMiOlt7Im51bWJlciI6IlUzIiwic3ltYm9sIjoiMDEwVTMuc3ZnIiwiZGlyZWN0aW9uIjoiRvxyc3RlbnJpZWQgV2VzdCIsInN0YXRlbGVzcyI6InN3bTowMTBVMzpHOkg6MDE2IiwibmFtZSI6IlUtQmFobiJ9LHsibnVtYmVyIjoiVTMiLCJzeW1ib2wiOiIwMTBVMy5zdmciLCJkaXJlY3Rpb24iOiJNb29zYWNoIiwic3RhdGVsZXNzIjoic3dtOjAxMFUzOkc6UjowMTYiLCJuYW1lIjoiVS1CYWhuIn0seyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6IkFpZGVuYmFjaHN0cmHfZSIsInN0YXRlbGVzcyI6InN3bTowMzA1MTpHOkg6MDE2IiwibmFtZSI6Ik1ldHJvQnVzIn0seyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6Ik1vb3NhY2giLCJzdGF0ZWxlc3MiOiJzd206MDMwNTE6RzpSOjAxNiIsIm5hbWUiOiJNZXRyb0J1cyJ9XSwibGVhZFRpbWVNaW51dGVzIjowfV0sImxpbmVzIjpbXSwibWF4UmVzdWx0cyI6MTAsImZldGNoSW50ZXJ2YWxJbk1pbnV0ZXMiOjIsInNob3dOb3RpZmljYXRpb24iOnRydWV9"
-        ></div>
-      </div>
-    </div>
-
-    <script>
-      (function () {
-        const outer = document.getElementById("outer");
-        const stage = document.getElementById("stage");
-
-        function scaleToFit() {
-          const outerW = outer.clientWidth || 1;
-          const outerH = outer.clientHeight || 1;
-
-          // Read the declared design size from CSS custom properties
-          const cs = getComputedStyle(stage);
-          const designW = parseFloat(cs.getPropertyValue("--design-w")) || stage.offsetWidth || 800;
-          const designH = parseFloat(cs.getPropertyValue("--design-h")) || stage.offsetHeight || 600;
-
-          // Scale so EVERYTHING fits (no cropping)
-          const scale = Math.min(outerW / designW, outerH / designH);
-
-          stage.style.transform = `scale(${scale})`;
-
-          // Optional: center it within the available space
-          const scaledW = designW * scale;
-          const scaledH = designH * scale;
-          stage.style.left = `${Math.max(0, (outerW - scaledW) / 2)}px`;
-          stage.style.top = `${Math.max(0, (outerH - scaledH) / 2)}px`;
-        }
-
-        // React to any size changes from Homey
-        const ro = new ResizeObserver(scaleToFit);
-        ro.observe(outer);
-
-        // Initial scale
-        window.addEventListener("load", scaleToFit);
-        window.addEventListener("orientationchange", scaleToFit);
-      })();
-    </script>
-
-    <script
-      type="text/javascript"
-      src="https://www.mvv-muenchen.de/typo3conf/ext/sn_mvv_efa/Resources/Public/mvv-monitor/mvv-monitor.min.js"
-    ></script>
-  </body>
-</html>
+<script
+  type="text/javascript"
+  src="https://www.mvv-muenchen.de/typo3conf/ext/sn_mvv_efa/Resources/Public/mvv-monitor/mvv-monitor.min.js"
+></script>
