@@ -3,58 +3,57 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>MVV Abfahrten – Homey Widget</title>
+  <title>MVV Abfahrtsmonitor – Homey</title>
 
   <style>
-    /* Das iFrame/Homey-Widget soll komplett genutzt werden */
+    /* Homey iFrame/Widget komplett ausnutzen, keine Scrollbars */
     html, body {
       width: 100%;
       height: 100%;
       margin: 0;
       padding: 0;
-      overflow: hidden;            /* wichtig: keine Scrollbars im Homey-Widget */
+      overflow: hidden;
       background: transparent;
     }
 
-    /* Container füllt immer den kompletten verfügbaren Platz */
+    /* Viewport = verfügbarer Bereich im Widget */
     #viewport {
       position: relative;
       width: 100%;
       height: 100%;
-      overflow: hidden;            /* wir skalieren, statt abzuschneiden */
+      overflow: hidden;
     }
 
-    /*
-      #content wird skaliert.
-      min-width/min-height verhindern, dass der Inhalt “zusammenfällt”,
-      während das MVV-Script initial rendert.
-    */
+    /* Inhalt wird skaliert, damit immer alles sichtbar ist */
     #content {
       position: absolute;
       top: 0;
       left: 0;
-      transform-origin: 0 0;       /* Skalierung ab oben/links */
+      transform-origin: 0 0;
       will-change: transform;
+
+      /* fallback, damit initial messbar */
       min-width: 320px;
       min-height: 200px;
     }
-
-    /* Optional: Schärferes Rendering beim Skalieren */
-    * { -webkit-font-smoothing: antialiased; }
   </style>
 </head>
 
 <body>
   <div id="viewport">
     <div id="content">
+      <!-- DEIN WIDGET (unverändert als Grundlage) -->
       <div
         class="mvv-departure-monitor"
-        monitor-configuration="eyJsYW5ndWFnZSI6eyJkZXBhcnR1cmUiOiJBYmZhaHJ0IiwidHJhaW5TdG9wcyI6IkhhbHRlc3RlbGxlbiIsImRpcmVjdGlvbiI6IlJpY2h0dW5nIiwiZm9vdGVyTm90ZSI6IqkgQ29weXJpZ2h0IiwiZm9vdGVyVGV4dCI6IldlaXRlcmUgRmFocnBsYW5hdXNr/G5mdGUgdW50ZXIgd3d3Lm12di1hdXNrdW5mdC5kZSBvZGVyIG1pdCBkZXIgTVZWLUFwcCIsImhlYWRlclRleHQiOiJBYmZhaHJ0ZW4gZvxyIGhldXRlLCAiLCJsYW5ndWFnZSI6ImRlIiwibGluZSI6IkxpbmllIiwibGl2ZSI6IkxpdmUiLCJzdG9wIjoiSGFsdGVzdGVsbGUiLCJ0cmFjayI6IkdsZWlzIn0sImlzRnVsbHNjcmVlbiI6ZmFsc2UsInN0YXRpb25zIjpbeyJzdGF0aW9uIjp7InVzYWdlIjoic2YiLCJ0eXBlIjoiYW55IiwibmFtZSI6Ik38bmNoZW4sIERyeWdhbHNraS1BbGxlZSIsInN0YXRlbGVzcyI6IjkxMDAxNDY0IiwiYW55VHlwZSI6InN0b3AiLCJzb3J0IjoiMiIsInF1YWxpdHkiOiIyNjQiLCJiZXN0IjoiMSIsIm9iamVjdCI6IkRyeWdhbHNraS1BbGxlZSIsIm1haW5Mb2MiOiJN/G5jaGVuIiwibW9kZXMiOiI1IiwicmVmIjp7ImlkIjoiOTEwMDE0NjQiLCJnaWQiOiJkZTowOTE2MjoxNDY0Iiwib21jIjoiOTE2MjAwMCIsInBsYWNlSUQiOiIxIiwicGxhY2UiOiJN/G5jaGVuIiwiY29vcmRzIjoiMTI4MTEwOS4wMDAwMCw1ODc2Nzk3LjAwMDAwIn0sImlkIjoiZGU6MDkxNjI6MTQ2NCJ9LCJsaW5lcyI6W3sibnVtYmVyIjoiMTMyIiwic3ltYm9sIjoiMDMxMzIuc3ZnIiwiZGlyZWN0aW9uIjoiTWFyaWVucGxhdHoiLCJzdGF0ZWxlc3MiOiJzd206MDMxMzI6RzpSOjAxNiIsIm5hbWUiOiJCdXMifV0sImFsbExpbmVzIjpbeyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6IkFpZGVuYmFjaHN0cmHfZSIsInN0YXRlbGVzcyI6InN3bTowMzA1MTpHOkg6MDE2IiwibmFtZSI6Ik1ldHJvQnVzIn0seyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6Ik1vb3NhY2giLCJzdGF0ZWxlc3MiOiJzd206MDMwNTE6RzpSOjAxNiIsIm5hbWUiOiJNZXRyb0J1cyJ9LHsibnVtYmVyIjoiMTMyIiwic3ltYm9sIjoiMDMxMzIuc3ZnIiwiZGlyZWN0aW9uIjoiRm9yc3RlbnJpZWRlciBQYXJrIiwic3RhdGVsZXNzIjoic3dtOjAzMTMyOkc6SDowMTYiLCJuYW1lIjoiQnVzIn0seyJudW1iZXIiOiIxMzIiLCJzeW1ib2wiOiIwMzEzMi5zdmciLCJkaXJlY3Rpb24iOiJNYXJpZW5wbGF0eiIsInN0YXRlbGVzcyI6InN3bTowMzEzMjpHOlI6MDE2IiwibmFtZSI6IkJ1cyJ9LHsibnVtYmVyIjoiMTUxIiwic3ltYm9sIjoiMDMxNTEuc3ZnIiwiZGlyZWN0aW9uIjoiUGFya3N0YWR0IFNvbGxuIiwic3RhdGVsZXNzIjoic3dtOjAzMTUxOkc6SDowMTYiLCJuYW1lIjoiQnVzIn0seyJudW1iZXIiOiIxNTEiLCJzeW1ib2wiOiIwMzE1MS5zdmciLCJkaXJlY3Rpb24iOiJXZXN0ZnJpZWRob2YiLCJzdGF0ZWxlc3MiOiJzd206MDMxNTE6RzpSOjAxNiIsIm5hbWUiOiJCdXMifV0sImxlYWRUaW1lTWludXRlcyI6MH1dLCJsaW5lcyI6W10sIm1heFJlc3VsdHMiOjEwLCJmZXRjaEludGVydmFsSW5NaW51dGVzIjoyLCJzaG93Tm90aWZpY2F0aW9uIjp0cnVlfQ==">
+        monitor-configuration="eyJsYW5ndWFnZSI6eyJkZXBhcnR1cmUiOiJBYmZhaHJ0IiwidHJhaW5TdG9wcyI6IkhhbHRlc3RlbGxlbiIsImRpcmVjdGlvbiI6IlJpY2h0dW5nIiwiZm9vdGVyTm90ZSI6IqkgQ29weXJpZ2h0IiwiZm9vdGVyVGV4dCI6IldlaXRlcmUgRmFocnBsYW5hdXNr/G5mdGUgdW50ZXIgd3d3Lm12di1hdXNrdW5mdC5kZSBvZGVyIG1pdCBkZXIgTVZWLUFwcCIsImhlYWRlclRleHQiOiJBYmZhaHJ0ZW4gZvxyIGhldXRlLCAiLCJsYW5ndWFnZSI6ImRlIiwibGluZSI6IkxpbmllIiwibGl2ZSI6IkxpdmUiLCJzdG9wIjoiSGFsdGVzdGVsbGUiLCJ0cmFjayI6IkdsZWlzIn0sImlzRnVsbHNjcmVlbiI6ZmFsc2UsInN0YXRpb25zIjpbeyJzdGF0aW9uIjp7InVzYWdlIjoic2YiLCJ0eXBlIjoiYW55IiwibmFtZSI6Ik38bmNoZW4sIERyeWdhbHNraS1BbGxlZSIsInN0YXRlbGVzcyI6IjkxMDAxNDY0IiwiYW55VHlwZSI6InN0b3AiLCJzb3J0IjoiMiIsInF1YWxpdHkiOiIyNjQiLCJiZXN0IjoiMSIsIm9iamVjdCI6IkRyeWdhbHNraS1BbGxlZSIsIm1haW5Mb2MiOiJN/G5jaGVuIiwibW9kZXMiOiI1IiwicmVmIjp7ImlkIjoiOTEwMDE0NjQiLCJnaWQiOiJkZTowOTE2MjoxNDY0Iiwib21jIjoiOTE2MjAwMCIsInBsYWNlSUQiOiIxIiwicGxhY2UiOiJN/G5jaGVuIiwiY29vcmRzIjoiMTI4MTEwOS4wMDAwMCw1ODc2Nzk3LjAwMDAwIn0sImlkIjoiZGU6MDkxNjI6MTQ2NCJ9LCJsaW5lcyI6W3sibnVtYmVyIjoiMTMyIiwic3ltYm9sIjoiMDMxMzIuc3ZnIiwiZGlyZWN0aW9uIjoiTWFyaWVucGxhdHoiLCJzdGF0ZWxlc3MiOiJzd206MDMxMzI6RzpSOjAxNiIsIm5hbWUiOiJCdXMifV0sImFsbExpbmVzIjpbeyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6IkFpZGVuYmFjaHN0cmHfZSIsInN0YXRlbGVzcyI6InN3bTowMzA1MTpHOkg6MDE2IiwibmFtZSI6Ik1ldHJvQnVzIn0seyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6Ik1vb3NhY2giLCJzdGF0ZWxlc3MiOiJzd206MDMwNTE6RzpSOjAxNiIsIm5hbWUiOiJNZXRyb0J1cyJ9LHsibnVtYmVyIjoiMTMyIiwic3ltYm9sIjoiMDMxMzIuc3ZnIiwiZGlyZWN0aW9uIjoiRm9yc3RlbnJpZWRlciBQYXJrIiwic3RhdGVsZXNzIjoic3dtOjAzMTMyOkc6SDowMTYiLCJuYW1lIjoiQnVzIn0seyJudW1iZXIiOiIxMzIiLCJzeW1ib2wiOiIwMzEzMi5zdmciLCJkaXJlY3Rpb24iOiJNYXJpZW5wbGF0eiIsInN0YXRlbGVzcyI6InN3bTowMzEzMjpHOlI6MDE2IiwibmFtZSI6IkJ1cyJ9LHsibnVtYmVyIjoiMTUxIiwic3ltYm9sIjoiMDMxNTEuc3ZnIiwiZGlyZWN0aW9uIjoiUGFya3N0YWR0IFNvbGxuIiwic3RhdGVsZXNzIjoic3dtOjAzMTUxOkc6SDowMTYiLCJuYW1lIjoiQnVzIn0seyJudW1iZXIiOiIxNTEiLCJzeW1ib2wiOiIwMzE1MS5zdmciLCJkaXJlY3Rpb24iOiJXZXN0ZnJpZWRob2YiLCJzdGF0ZWxlc3MiOiJzd206MDMxNTE6RzpSOjAxNiIsIm5hbWUiOiJCdXMifV0sImxlYWRUaW1lTWludXRlcyI6MH0seyJzdGF0aW9uIjp7InVzYWdlIjoic2YiLCJ0eXBlIjoiYW55IiwibmFtZSI6Ik38bmNoZW4sIE1hY2h0bGZpbmdlciBTdHJh32UiLCJzdGF0ZWxlc3MiOiI5MTAwMTQ3MCIsImFueVR5cGUiOiJzdG9wIiwic29ydCI6IjIiLCJxdWFsaXR5IjoiNDMxIiwiYmVzdCI6IjEiLCJvYmplY3QiOiJNYWNodGxmaW5nZXIgU3RyYd9lIiwibWFpbkxvYyI6Ik38bmNoZW4iLCJtb2RlcyI6IjIsNSIsInJlZiI6eyJpZCI6IjkxMDAxNDcwIiwiZ2lkIjoiZGU6MDkxNjI6MTQ3MCIsIm9tYyI6IjkxNjIwMDAiLCJwbGFjZUlEIjoiMSIsInBsYWNlIjoiTfxuY2hlbiIsImNvb3JkcyI6IjEyODE3NDEuMDAwMDAsNTg3Njk1Ni4wMDAwMCJ9LCJpZCI6ImRlOjA5MTYyOjE0NzAifSwibGluZXMiOlt7Im51bWJlciI6IlUzIiwic3ltYm9sIjoiMDEwVTMuc3ZnIiwiZGlyZWN0aW9uIjoiTW9vc2FjaCIsInN0YXRlbGVzcyI6InN3bTowMTBVMzpHOlI6MDE2IiwibmFtZSI6IlUtQmFobiJ9XSwiYWxsTGluZXMiOlt7Im51bWJlciI6IlUzIiwic3ltYm9sIjoiMDEwVTMuc3ZnIiwiZGlyZWN0aW9uIjoiRvxyc3RlbnJpZWQgV2VzdCIsInN0YXRlbGVzcyI6InN3bTowMTBVMzpHOkg6MDE2IiwibmFtZSI6IlUtQmFobiJ9LHsibnVtYmVyIjoiVTMiLCJzeW1ib2wiOiIwMTBVMy5zdmciLCJkaXJlY3Rpb24iOiJNb29zYWNoIiwic3RhdGVsZXNzIjoic3dtOjAxMFUzOkc6UjowMTYiLCJuYW1lIjoiVS1CYWhuIn0seyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6IkFpZGVuYmFjaHN0cmHfZSIsInN0YXRlbGVzcyI6InN3bTowMzA1MTpHOkg6MDE2IiwibmFtZSI6Ik1ldHJvQnVzIn0seyJudW1iZXIiOiI1MSIsInN5bWJvbCI6IjI0MDUxLnN2ZyIsImRpcmVjdGlvbiI6Ik1vb3NhY2giLCJzdGF0ZWxlc3MiOiJzd206MDMwNTE6RzpSOjAxNiIsIm5hbWUiOiJNZXRyb0J1cyJ9XSwibGVhZFRpbWVNaW51dGVzIjowfV0sImxpbmVzIjpbXSwibWF4UmVzdWx0cyI6MTAsImZldGNoSW50ZXJ2YWxJbk1pbnV0ZXMiOjIsInNob3dOb3RpZmljYXRpb24iOnRydWV9">
       </div>
     </div>
   </div>
 
-  <script src="https://www.mvv-muenchen.de/typo3conf/ext/sn_mvv_efa/Resources/Public/mvv-monitor/mvv-monitor.min.js"></script>
+  <script
+    type="text/javascript"
+    src="https://www.mvv-muenchen.de/typo3conf/ext/sn_mvv_efa/Resources/Public/mvv-monitor/mvv-monitor.min.js">
+  </script>
 
   <script>
     (function () {
@@ -63,48 +62,51 @@
 
       let raf = 0;
 
-      function fitToViewport() {
+      function measureContent() {
+        // Wichtig: transform kurz zurücksetzen, damit wir echte Maße bekommen
+        content.style.transform = "scale(1)";
+
+        // Scroll* ist oft zuverlässiger, wenn das MVV-Widget intern wächst
+        const w = Math.max(content.scrollWidth, content.offsetWidth);
+        const h = Math.max(content.scrollHeight, content.offsetHeight);
+        return { w, h };
+      }
+
+      function fit() {
         cancelAnimationFrame(raf);
         raf = requestAnimationFrame(() => {
-          // Reset, damit wir die "natürliche" Größe messen können
-          content.style.transform = "scale(1)";
-          content.style.width = "auto";
-          content.style.height = "auto";
-
-          // NACH dem Reset messen
           const vpW = viewport.clientWidth;
           const vpH = viewport.clientHeight;
+          if (!vpW || !vpH) return;
 
-          // Scroll-Größen nehmen, weil der MVV-Block intern wachsen kann
-          const cW = Math.max(content.scrollWidth, content.offsetWidth);
-          const cH = Math.max(content.scrollHeight, content.offsetHeight);
+          const { w: cW, h: cH } = measureContent();
+          if (!cW || !cH) return;
 
-          if (!vpW || !vpH || !cW || !cH) return;
-
-          // Skalierung so, dass alles IMMER komplett sichtbar ist
+          // Kompletten Inhalt immer sichtbar halten:
           const scale = Math.min(vpW / cW, vpH / cH);
 
           content.style.transform = `scale(${scale})`;
 
-          // Optional: Click/Touch-Fläche passend machen (verhindert “tote” Bereiche)
-          content.style.width = (cW) + "px";
-          content.style.height = (cH) + "px";
+          // Touch/Click-Fläche konsistent halten
+          content.style.width = cW + "px";
+          content.style.height = cH + "px";
         });
       }
 
-      // Reagiert auf Homey-Widget-Größenänderungen
-      const ro = new ResizeObserver(fitToViewport);
+      // Reagiert auf Widget-Größenänderungen
+      const ro = new ResizeObserver(fit);
       ro.observe(viewport);
 
-      // Reagiert auf DOM-Änderungen im MVV-Widget (neue Abfahrten, andere Zeilenanzahl, etc.)
-      const mo = new MutationObserver(fitToViewport);
+      // Reagiert auf Änderungen, wenn MVV neue Daten rendert
+      const mo = new MutationObserver(fit);
       mo.observe(content, { childList: true, subtree: true, attributes: true });
 
-      // Initial + nach kurzem Delay (falls das MVV-Script etwas später rendert)
       window.addEventListener("load", () => {
-        fitToViewport();
-        setTimeout(fitToViewport, 250);
-        setTimeout(fitToViewport, 1000);
+        fit();
+        // MVV rendert teils verzögert → mehrfach nachtriggern
+        setTimeout(fit, 200);
+        setTimeout(fit, 800);
+        setTimeout(fit, 2000);
       });
     })();
   </script>
